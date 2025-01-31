@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clicker Game</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <h1 id="title">Clicker Game</h1>
+  <p id="score_show">Điểm: <span id="score">0</span></p>
+  <div class="game-container">
+    <button id="clickButton">🍪</button>
+  </div>
+
+  <div class="shop-container">
+    <h2 id="shop-title">Cửa hàng</h2>
+    <div class="std"></div>
+    <ul id="shop-list"></ul>
+  </div>
+
+  <!-- Phần cập nhật ở bên phải -->
+  <div class="update-container">
+    <h2>Nâng cấp</h2>
+    <ul id="upgrades-list">
+      <!-- Các nâng cấp sẽ được thêm vào đây -->
+    </ul>
+  </div>
+
+  <div id="toast-container"></div>
+
+  <!-- Đặt container ngoài body -->
+  <div id="achievements-container">
+    <h2 style="text-align: center;">Thành tựu</h2>
+    <ul id="achievements-list"></ul>
+    <p id="no-achievements">Bạn chưa có thành tựu nào cả</p>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+
+</html>
