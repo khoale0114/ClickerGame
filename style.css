@@ -8,6 +8,11 @@ body {
   height: 100vh;
   margin: 0;
   flex-direction: column; /* Đảm bảo các phần tử căn theo chiều dọc */
+  -webkit-user-select: none; /* Safari */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none; /* Standard */
+
 }
 
 .game-container {
@@ -172,6 +177,8 @@ button:active {
   border-radius: 10px;
   width: 200px;
   max-width: 200px;
+  max-height: calc(100vh - 280px); /* Đảm bảo chiều cao không vượt quá chiều cao của body */
+  overflow-y: auto; /* Thêm thanh cuộn dọc khi nội dung vượt quá chiều cao tối đa */
   z-index: 5; /* Đảm bảo Upgrade nằm dưới Shop */
 }
 
