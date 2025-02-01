@@ -49,10 +49,18 @@ const shopItems = [
 
 // Danh sách nâng cấp có thể mua nhiều lần
 const upgrades = [
-  { name: '🎯 Luyện tập', cost: 10, level: 0, type: 'click' },
-  { name: '🧑‍🍳 Đầu bếp', cost: 200, level: 0, type: 'chef' },
-  { name: '🧑‍🌾 Nông dân', cost: 800, level: 0, type: 'farmer'},
-  { name: '⛏️ Thợ mỏ', cost: 1700, level: 0, type: 'miner'}
+  { name: '🎯 Luyện tập', cost: 10, level: 0, type: 'click', effect: () => click += 1, cpsIncrease: 0 },
+  { name: '🧑‍🍳 Đầu bếp', cost: 200, level: 0, type: 'chef', effect: () => cps += 1, cpsIncrease: 1 },
+  { name: '🧑‍🌾 Nông dân', cost: 800, level: 0, type: 'farmer', effect: () => cps += 4, cpsIncrease: 4 },
+  { name: '⛏️ Thợ mỏ', cost: 1700, level: 0, type: 'miner', effect: () => cps += 12, cpsIncrease: 12 },
+  { name: '🏭 Nhà máy', cost: 53000, level: 0, type: 'factory', effect: () => cps += 50, cpsIncrease: 50 },
+  { name: '🏦 Ngân hàng', cost: 2480000, level: 0, type: 'bank', effect: () => cps += 100, cpsIncrease: 100 },
+  { name: '🛕 Đền thờ', cost: 8520000, level: 0, type: 'temple', effect: () => cps += 400, cpsIncrease: 400 },
+  { name: '🧙 Tòa tháp pháp sư', cost: 2061000, level: 0, type: 'wizard', effect: () => cps += 5000, cpsIncrease: 5000 },
+  { name: '🚀 Du hành không gian', cost: 843700000, level: 0, type: 'space', effect: () => cps += 100000, cpsIncrease: 100000 },
+  { name: '🪞 Cổng không gian', cost: 740000000000, level: 0, type: 'portal', effect: () => cps += 2000000, cpsIncrease: 2000000 },
+  { name: '🕒 Du hành thời gian', cost: 369000000000000, level: 0, type: 'time', effect: () => cps += 570000000, cpsIncrease: 570000000 },
+  { name: '✨ Công nghệ nén ánh sáng', cost: 2900000000000000, level: 0, type: 'light', effect: () => cps += 29830000000, cpsIncrease: 29830000000 }
 ];
 
 // Danh sách achievements
@@ -63,6 +71,21 @@ const achievements = [
   { name: '🧑‍🍳 Chủ một nhà hàng', description: 'Thuê một đầu bếp', achieved: false, condition: () => chef >= 1 },
   { name: '🧑‍🌾 Cây đột biến', description: 'Thuê một nông dân', achieved: false, condition: () => farmer >= 1}
 ];
+
+function formatNumber(number) {
+  if (number >= 1e12) {
+    return (number / 1e12).toFixed(1) + 'T';  // Tỷ
+  } else if (number >= 1e9) {
+    return (number / 1e9).toFixed(1) + 'B';  // Tỷ
+  } else if (number >= 1e6) {
+    return (number / 1e6).toFixed(1) + 'M';  // Triệu
+  } else if (number >= 1e3) {
+    return (number / 1e3).toFixed(1) + 'K';  // Nghìn
+  } else {
+    return number;  // Nếu số bé hơn 1000, không cần rút gọn
+  }
+}
+
 
 function showToast(message) {
   const toast = document.createElement("div");
@@ -87,31 +110,21 @@ function showToast(message) {
 }
 
 
-// Hàm mua nâng cấp (có thể mua nhiều lần)
+// Hàm hiển thị danh sách nâng cấp
 function displayUpgrades() {
   upgradesList.innerHTML = ''; // Xóa danh sách hiện tại
   upgrades.forEach((upgrade, index) => {
     const li = document.createElement('li');
     li.classList.add('upgrade-item');
-    li.textContent = `${upgrade.name} - ${upgrade.cost} điểm`;
 
-    // Gán title khác nhau cho từng upgrade
-    if (upgrade.type === 'click') {
-      li.title = `Tăng thêm 1 điểm mỗi lần nhấn\n`;
-    } else if (upgrade.type === 'chef') {
-      li.title = `Tăng thêm 1 điểm mỗi giây\n /ngon hơn, nhưng không phải do bạn làm - Khoale/`;
-    } else if (upgrade.type === 'farmer') {
-      li.title = `Tăng thêm 6 điểm mỗi giây\n /Ảo thật đấy, cây "cookie" à - Khoale`;
-    } else if (upgrade.type === 'miner') {
-      li.title = `Tăng thêm 12 điểm mỗi giây`;
-    }
+    // Hiển thị thông tin nâng cấp với CPS tăng thêm và giá rút gọn
+    li.textContent = `${upgrade.name} - ${formatNumber(upgrade.cost)} điểm +${formatNumber(upgrade.cpsIncrease)} CPS`;
 
-    // Thay đổi màu sắc của phần tử nếu không đủ điểm
-    if (score < upgrade.cost) {
-      li.style.color = '#828282'; // Màu nhạt hơn nếu không đủ tiền
-    } else {
-      li.style.color = '#fff'; // Màu trắng khi đủ tiền
-    }
+    // Hiển thị mô tả khi hover vào nâng cấp
+    li.title = getUpgradeDescription(upgrade);
+
+    // Cập nhật màu sắc cho item nâng cấp
+    li.style.color = score >= upgrade.cost ? '#fff' : '#828282';
 
     // Khi click vào sẽ mua nâng cấp
     li.addEventListener('click', () => buyUpgrade(index));
@@ -120,6 +133,8 @@ function displayUpgrades() {
   });
 }
 
+
+
 // Hàm mua nâng cấp (có thể mua nhiều lần)
 function buyUpgrade(index) {
   const upgrade = upgrades[index];
@@ -127,22 +142,46 @@ function buyUpgrade(index) {
     score -= upgrade.cost; // Trừ điểm
     upgrade.level++; // Tăng cấp độ nâng cấp
 
-    // Xử lý từng loại nâng cấp
-    if (upgrade.type === 'click') {
-      click += 1; // Mỗi cấp tăng 1 điểm khi nhấn
-    } else if (upgrade.type === 'chef') {
-      cps += 1; // Mỗi cấp tăng 1 CPS
-    } else if (upgrade.type === 'farmer') {
-      cps += 4;
-    } else if (upgrade.type === 'farmer') {
-      cps += 12;
-    }
+    // Áp dụng effect nâng cấp
+    upgrade.effect();
 
-    // Tăng giá nâng cấp (công thức tăng giá, có thể chỉnh sửa)
+    // Tăng giá nâng cấp
     upgrade.cost = Math.floor(upgrade.cost * 1.5);
 
-    scoreDisplay.textContent = Math.floor(score * 100) / 100; // Cập nhật điểm
+    // Cập nhật lại điểm
+    scoreDisplay.textContent = Math.floor(score * 100) / 100;
     displayUpgrades(); // Cập nhật lại danh sách nâng cấp
+  }
+}
+
+function getUpgradeDescription(upgrade) {
+  switch (upgrade.type) {
+    case 'click':
+      return `Tăng thêm 1 điểm mỗi lần nhấn`;
+    case 'chef':
+      return `Tăng CPS mỗi giây, giúp bạn nhận điểm tự động.`;
+    case 'farmer':
+      return `Tăng CPS mỗi giây, giúp bạn nhận điểm tự động.`;
+    case 'miner':
+      return `Tăng CPS mỗi giây, giúp bạn nhận điểm tự động.`;
+    case 'factory':
+      return `Tăng CPS mỗi giây, giúp bạn nhận điểm tự động.`;
+    case 'bank':
+      return `Tăng CPS mỗi giây, giúp bạn nhận điểm tự động.`;
+    case 'temple':
+      return `Tăng CPS mỗi giây, giúp bạn nhận điểm tự động.`;
+    case 'wizard':
+      return `Tăng CPS mỗi giây, giúp bạn nhận điểm tự động.`;
+    case 'space':
+      return `Tăng CPS mỗi giây, giúp bạn nhận điểm tự động.`;
+    case 'portal':
+      return `Tăng CPS mỗi giây, giúp bạn nhận điểm tự động.`;
+    case 'time':
+      return `Tăng CPS mỗi giây, giúp bạn nhận điểm tự động.`;
+    case 'light':
+      return `Tăng CPS mỗi giây, giúp bạn nhận điểm tự động.`;
+    default:
+      return '';
   }
 }
 
@@ -151,12 +190,32 @@ function updateCPS() {
   let currentTime = Date.now();
   let timeElapsed = (currentTime - lastUpdateTime) / 1000;
   if (timeElapsed >= 1) {
+    cps = calculateCPS(); // Cập nhật lại CPS mỗi giây
     score += cps; // Thêm CPS vào điểm
-    score = Math.floor(score * 100) / 100
-    scoreDisplay.textContent = score; // Cập nhật điểm hiển thị
+    score = Math.floor(score * 100) / 100; // Giới hạn số điểm
+    scoreDisplay.textContent = formatNumber(score); // Cập nhật điểm hiển thị
     lastUpdateTime = currentTime;
-    checkAchievements(); // Kiểm tra achievements mỗi giây
+    checkAchievements(); // Kiểm tra achievements
   }
+}
+
+
+function calculateCPS() {
+  // Tính tổng CPS dựa trên các nâng cấp và vật phẩm đã mua
+  let totalCPS = 0;
+
+  // Thêm CPS từ các nâng cấp (như Chef, Farmer, Miner...)
+  upgrades.forEach((upgrade) => {
+    if (upgrade.level > 0) {
+      totalCPS += upgrade.cpsIncrease * upgrade.level;
+    }
+  });
+
+  // Thêm CPS từ các vật phẩm (như Super Chef, Golden Click...)
+  if (chef > 0) totalCPS += chef * 10; // Ví dụ: mỗi đầu bếp tăng 10 CPS
+  if (farmer > 0) totalCPS += farmer * 20; // Ví dụ: mỗi nông dân tăng 20 CPS
+
+  return totalCPS;
 }
 
 let showAllItems = false; // Trạng thái hiển thị toàn bộ vật phẩm
@@ -233,7 +292,6 @@ function buyItem(index) {
   if (score >= item.cost) {
     score -= item.cost;
     item.effect(); // Áp dụng hiệu ứng vật phẩm
-    updateScore(); // Cập nhật điểm số
     showToast(`You bought ${item.name}!`);
   } else {
     showToast("Not enough points!");
@@ -244,7 +302,7 @@ function buyItem(index) {
 clickButton.addEventListener('click', (event) => {
   score += click; // Tăng điểm theo số lượng click hiện tại
   all_score += click;
-  scoreDisplay.textContent = score; // Cập nhật điểm hiển thị
+  scoreDisplay.textContent = formatNumber(score); // Cập nhật điểm hiển thị
   displayUpgrades(); // Cập nhật danh sách nâng cấp
   checkAchievements(); // Kiểm tra achievements khi nhấn
 
@@ -276,6 +334,12 @@ clickButton.addEventListener('click', (event) => {
     document.body.removeChild(clickDisplay); // Xóa phần tử sau khi hiệu ứng hoàn thành
   }, 500);
 });
+
+function upadateScore() {
+  setTimeout(() => {
+    scoreDisplay.textContent = formatNumber(score);
+  }, 200);
+}
 
 // Hàm kiểm tra achievements
 function checkAchievements() {
@@ -333,7 +397,6 @@ function adjustUpgradePosition() {
   // Đặt vị trí của phần nâng cấp ngay dưới phần shop
   updateContainer.style.top = `${shopHeight + 20}px`; // Thêm khoảng cách
 }
-
 
 
 // Cập nhật CPS mỗi giây
