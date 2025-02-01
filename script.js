@@ -1,11 +1,19 @@
 // script.js
 let score = 0;
 let all_score = score;
-let click = 1;
+let click = 0.2;
 let cps = 0;
 let chef = 0;
 let farmer = 0;
 let miner = 0;
+let factory = 0;
+let bank = 0;
+let temple = 0;
+let wizard = 0;
+let space = 0;
+let portal = 0;
+let time = 0;
+let light = 0;
 let lastUpdateTime = Date.now();
 
 const scoreDisplay = document.getElementById('score');
@@ -19,7 +27,7 @@ const toastContainer = document.getElementById('toast-container'); // Phần t�
 const shopItems = [
   {
     name: "🥇 Super Chef",
-    cost: 600,
+    cost: 1200,
     description: "Điểm click và CPS sẽ bằng số điểm click * CPS",
     effect: () => {
       click = click * cps; // Nhân điểm click lên số CPS hiện tại
@@ -28,7 +36,7 @@ const shopItems = [
   },
   {
     name: "✨ Golden Click",
-    cost: 1000,
+    cost: 2800,
     description: "Tăng giá trị mỗi lần click lên 30.",
     effect: () => click += 30
   },
@@ -49,18 +57,18 @@ const shopItems = [
 
 // Danh sách nâng cấp có thể mua nhiều lần
 const upgrades = [
-  { name: '🎯 Luyện tập', cost: 10, level: 0, type: 'click', effect: () => click += 1, cpsIncrease: 0 },
-  { name: '🧑‍🍳 Đầu bếp', cost: 200, level: 0, type: 'chef', effect: () => cps += 1, cpsIncrease: 1 },
-  { name: '🧑‍🌾 Nông dân', cost: 800, level: 0, type: 'farmer', effect: () => cps += 4, cpsIncrease: 4 },
-  { name: '⛏️ Thợ mỏ', cost: 1700, level: 0, type: 'miner', effect: () => cps += 12, cpsIncrease: 12 },
-  { name: '🏭 Nhà máy', cost: 53000, level: 0, type: 'factory', effect: () => cps += 50, cpsIncrease: 50 },
-  { name: '🏦 Ngân hàng', cost: 2480000, level: 0, type: 'bank', effect: () => cps += 100, cpsIncrease: 100 },
-  { name: '🛕 Đền thờ', cost: 8520000, level: 0, type: 'temple', effect: () => cps += 400, cpsIncrease: 400 },
-  { name: '🧙 Tòa tháp pháp sư', cost: 2061000, level: 0, type: 'wizard', effect: () => cps += 5000, cpsIncrease: 5000 },
-  { name: '🚀 Du hành không gian', cost: 843700000, level: 0, type: 'space', effect: () => cps += 100000, cpsIncrease: 100000 },
-  { name: '🪞 Cổng không gian', cost: 740000000000, level: 0, type: 'portal', effect: () => cps += 2000000, cpsIncrease: 2000000 },
-  { name: '🕒 Du hành thời gian', cost: 369000000000000, level: 0, type: 'time', effect: () => cps += 570000000, cpsIncrease: 570000000 },
-  { name: '✨ Công nghệ nén ánh sáng', cost: 2900000000000000, level: 0, type: 'light', effect: () => cps += 29830000000, cpsIncrease: 29830000000 }
+  { name: '🎯 Luyện tập', cost: 10, level: 0, type: 'click', effect: () => click += 0.1, cpsIncrease: 0 },
+  { name: '🧑‍🍳 Đầu bếp', cost: 200, level: 0, type: 'chef', effect: () => {cps += 0.2, chef += 1}, cpsIncrease: 0.2 },
+  { name: '🧑‍🌾 Nông dân', cost: 800, level: 0, type: 'farmer', effect: () => {cps += 2, farmer += 1}, cpsIncrease: 2 },
+  { name: '⛏️ Thợ mỏ', cost: 1_700, level: 0, type: 'miner', effect: () => {cps += 7, miner += 1}, cpsIncrease: 7 },
+  { name: '🏭 Nhà máy', cost: 53_000, level: 0, type: 'factory', effect: () => {cps += 40, factory += 1}, cpsIncrease: 40 },
+  { name: '🏦 Ngân hàng', cost: 2_480_000, level: 0, type: 'bank', effect: () => {cps += 100, bank += 1}, cpsIncrease: 100 },
+  { name: '🛕 Đền thờ', cost: 8_520_000, level: 0, type: 'temple', effect: () => {cps += 400, temple += 1}, cpsIncrease: 400 },
+  { name: '🧙 Tòa tháp pháp sư', cost: 20_610_000, level: 0, type: 'wizard', effect: () => {cps += 5_000, wizard += 1}, cpsIncrease: 5_000 },
+  { name: '🚀 Du hành không gian', cost: 843_700_000, level: 0, type: 'space', effect: () => {cps += 100_000, space += 1}, cpsIncrease: 100_000 },
+  { name: '🪞 Cổng không gian', cost: 740_000_000_000, level: 0, type: 'portal', effect: () => {cps += 2_000_000, portal += 1}, cpsIncrease: 2_000_000 },
+  { name: '🕒 Du hành thời gian', cost: 369_000_000_000_000, level: 0, type: 'time', effect: () => {cps += 570_000_000, time += 1}, cpsIncrease: 570_000_000 },
+  { name: '✨ Công nghệ nén ánh sáng', cost: 2_900_000_000_000_000, level: 0, type: 'light', effect: () => {cps += 29_830_000_000, light += 1}, cpsIncrease: 29_830_000_000 }
 ];
 
 // Danh sách achievements
@@ -69,8 +77,21 @@ const achievements = [
   { name: '💰 Đại gia', description: 'Có hơn 100 điểm', achieved: false, condition: () => score >= 100 },
   { name: '🏅 Bậc thầy clicker', description: 'Nhấn 500 lần', achieved: false, condition: () => all_score >= 500 },
   { name: '🧑‍🍳 Chủ một nhà hàng', description: 'Thuê một đầu bếp', achieved: false, condition: () => chef >= 1 },
-  { name: '🧑‍🌾 Cây đột biến', description: 'Thuê một nông dân', achieved: false, condition: () => farmer >= 1}
+  { name: '🧑‍🌾 Cây đột biến', description: 'Thuê một nông dân', achieved: false, condition: () => farmer >= 1},
+  { name: '⛏️ Mỏ vàng', description: 'Thuê một thợ mỏ', achieved: false, condition: () => miner >= 1},
+  { name: '🏭 Nhà máy cookie', description: 'Xây nhà máy đầu tiên', achieved: false, condition: () => factory >= 1},
+  { name: '🏦 Cho vay nặng cookie', description: 'Xây một Ngân hàng', achieved: false, condition: () => bank >= 1},
+  { name: '🛕 Thờ cúng cookie', description: 'Xây một Đền thờ', achieved: false, condition: () => temple >= 1},
+  { name: '🧙 Úm ba la', description: 'Xây một Tòa tháp pháp sư', achieved: false, condition: () => wizard >= 1},
+  { name: '🚀 Du hành không gian', description: 'Xây một Tàu không gian', achieved: false, condition: () => space >= 1},
+  { name: '😈 Đến giờ ăn trộm rồi', description: 'Xây một Cổng không gian', achieved: false, condition: () => portal >= 1},
+  { name: '🕒 Doraemon', description: 'Xây một Du hành thời gian', achieved: false, condition: () => time >= 1},
+  { name: '✨ Thiên tài xuất hiện', description: 'Xây một Công nghệ nén ánh sáng', achieved: false, condition: () => light >= 1}
 ];
+
+function isFloat(number) {
+  return !Number.isInteger(number);
+}
 
 function formatNumber(number) {
   if (number >= 1e12) {
@@ -81,8 +102,10 @@ function formatNumber(number) {
     return (number / 1e6).toFixed(1) + 'M';  // Triệu
   } else if (number >= 1e3) {
     return (number / 1e3).toFixed(1) + 'K';  // Nghìn
+  } else if (isFloat(number)) {
+    return parseFloat(number.toFixed(1));
   } else {
-    return number;  // Nếu số bé hơn 1000, không cần rút gọn
+    return number;
   }
 }
 
@@ -118,7 +141,11 @@ function displayUpgrades() {
     li.classList.add('upgrade-item');
 
     // Hiển thị thông tin nâng cấp với CPS tăng thêm và giá rút gọn
-    li.textContent = `${upgrade.name} - ${formatNumber(upgrade.cost)} điểm +${formatNumber(upgrade.cpsIncrease)} CPS`;
+    if (upgrade.type === 'click') {
+      li.textContent = `${upgrade.name} - ${formatNumber(upgrade.cost)} điểm + 1 điểm/click`;
+    } else {
+      li.textContent = `${upgrade.name} - ${formatNumber(upgrade.cost)} điểm +${formatNumber(upgrade.cpsIncrease)} CPS`;
+    }
 
     // Hiển thị mô tả khi hover vào nâng cấp
     li.title = getUpgradeDescription(upgrade);
@@ -190,6 +217,7 @@ function updateCPS() {
   let currentTime = Date.now();
   let timeElapsed = (currentTime - lastUpdateTime) / 1000;
   if (timeElapsed >= 1) {
+    click = formatNumber(click);
     cps = calculateCPS(); // Cập nhật lại CPS mỗi giây
     score += cps; // Thêm CPS vào điểm
     score = Math.floor(score * 100) / 100; // Giới hạn số điểm
@@ -210,10 +238,6 @@ function calculateCPS() {
       totalCPS += upgrade.cpsIncrease * upgrade.level;
     }
   });
-
-  // Thêm CPS từ các vật phẩm (như Super Chef, Golden Click...)
-  if (chef > 0) totalCPS += chef * 10; // Ví dụ: mỗi đầu bếp tăng 10 CPS
-  if (farmer > 0) totalCPS += farmer * 20; // Ví dụ: mỗi nông dân tăng 20 CPS
 
   return totalCPS;
 }
