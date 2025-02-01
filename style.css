@@ -1,4 +1,25 @@
 /* style.css */
+/* Tùy chỉnh thanh cuộn cho tất cả các phần tử */
+*::-webkit-scrollbar {
+  width: 10px; /* Đặt chiều rộng của thanh cuộn dọc */
+  height: 10px; /* Đặt chiều cao của thanh cuộn ngang */
+}
+
+*::-webkit-scrollbar-track {
+  background: #f1f1f1; /* Màu nền của track */
+  border-radius: 10px; /* Bo tròn các góc của track */
+}
+
+*::-webkit-scrollbar-thumb {
+  background: #888; /* Màu của thumb */
+  border-radius: 10px; /* Bo tròn các góc của thumb */
+  border: 3px solid #f1f1f1; /* Viền của thumb */
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: #555; /* Màu của thumb khi hover */
+}
+
 body {
   font-family: Arial, sans-serif;
   background-color: white;
@@ -12,7 +33,6 @@ body {
   -moz-user-select: none; /* Firefox */
   -ms-user-select: none; /* Internet Explorer/Edge */
   user-select: none; /* Standard */
-
 }
 
 .game-container {
@@ -79,7 +99,7 @@ button:active {
   position: fixed;
   top: 10px; /* Vị trí của shop container cách trên 10px */
   right: 20px; /* Vị trí của shop container cách phải 20px */
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: gray;
   color: white;
   padding: 16px;
   font-size: 18px;
@@ -105,19 +125,28 @@ button:active {
 #shop-list {
   display: flex;
   flex-wrap: wrap; /* Cho phép các item xuống dòng */
-  gap: 10px;
-  max-width: 250px; /* Giới hạn chiều rộng */
+  gap: 10px; /* Khoảng cách giữa các item */
   list-style: none;
-  overflow: hidden;
-  padding-left: 0; /* Xóa khoảng cách bên trái */
-  width: fit-content; /* Đảm bảo danh sách không kéo dài toàn bộ trang */
-  align-items: center; /* Căn giữa theo chiều dọc */
+  padding-left: 0;
+  width: 100%; /* Đảm bảo chiều rộng của danh sách chiếm toàn bộ không gian */
+  justify-content: space-between; /* Căn giữa các item */
 }
+
+.shop-item {
+  display: block;
+  font-size: 16px; /* Đặt kích thước chữ cho phù hợp */
+  cursor: pointer;
+  width: calc(25% - 10px); /* Mỗi item sẽ chiếm 1/4 chiều rộng của container trừ khoảng cách */
+  text-align: center;
+  margin: 5px 0;
+}
+
 
 .shop-item {
   display: block; /* Đảm bảo không bị dính vào tiêu đề */
   font-size: 32px;
   cursor: pointer;
+  z-index: 10;
 }
 
 .shop-toggle {
@@ -170,24 +199,40 @@ button:active {
   position: fixed;
   top: 260px;
   right: 20px; /* Đảm bảo căn phải giống như shop */
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color:gray;
   color: white;
   padding: 20px;
   font-size: 18px;
   border-radius: 10px;
   width: 200px;
+  min-height: 32px;
   max-width: 200px;
   max-height: calc(100vh - 280px); /* Đảm bảo chiều cao không vượt quá chiều cao của body */
   overflow-y: auto; /* Thêm thanh cuộn dọc khi nội dung vượt quá chiều cao tối đa */
   z-index: 5; /* Đảm bảo Upgrade nằm dưới Shop */
 }
 
+.utd {
+  position: fixed;
+  background-color:gray;
+  top: 182px;
+  width: 200px;
+  height: 50px;
+  align-items: center;
+  z-index: 10;
+}
+
+#ut {
+  background-color: gray;
+  text-align: center;
+}
 
 #upgrades-list {
   list-style-type: none;
   padding: 0;
   max-width: 100%; /* Đảm bảo danh sách không vượt quá chiều rộng của phần nâng cấp */
-  overflow: hidden; /* Ẩn phần vượt quá */
+  overflow-x: hidden; /* Ẩn phần vượt quá */
+  margin-top: 64px;
 }
 
 .upgrade-item {
