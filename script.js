@@ -223,7 +223,7 @@ let showAllItems = false; // Trạng thái hiển thị toàn bộ vật phẩm
 function renderShop() {
   shopList.innerHTML = ""; // Xóa danh sách cũ
 
-  let itemsToShow = showAllItems ? shopItems.length : 3; // Hiển thị tối đa 3 item
+  let itemsToShow = showAllItems ? shopItems.length : 4; // Hiển thị tối đa 4 item
 
   shopItems.slice(0, itemsToShow).forEach((item, index) => {
     const li = document.createElement("li");
